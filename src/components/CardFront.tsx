@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { User } from "@/types/User"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { SocialLinksRow } from "./SoxialLinkRow";
@@ -10,6 +11,13 @@ interface UserCardProps {
 }
 
 export function CardFront({ user }: UserCardProps) {
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  const handleFlip = () => {
+    setIsFlipped(!isFlipped);
+    // TODO: Implement actual card flip animation
+  };
+
   return (
     <div className="@container w-full max-w-lg min-w-[320px] aspect-[1.62/1] mx-auto font-inter rounded-lg shadow-md p-[5%] flex flex-col justify-center bg-slate-50 relative">
       
@@ -36,8 +44,12 @@ export function CardFront({ user }: UserCardProps) {
           <p className="text-[clamp(8px,2cqw,12px)] text-slate-400 flex justify-center -mt-4 relative z-10">@{user.username}</p>
         </div>
       </div>
-      <button className="px-3 rounded-full">
-        <CardEdge className="absolute bottom-[5%] right-[5%] text-slate-400 cursor-pointer" />
+      <button 
+        onClick={handleFlip}
+        className="absolute bottom-[5%] right-[5%] p-2 cursor-pointer text-slate-400 hover:text-slate-600 transition-colors"
+        aria-label="Flip card"
+      >
+        <CardEdge />
       </button>
     </div>
   )
