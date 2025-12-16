@@ -1,4 +1,4 @@
-import { User } from "@/types/User";;
+import { User } from "@/types/User";
 import { CardFront } from "@/components/CardFront";
 
 export default function Home() {
