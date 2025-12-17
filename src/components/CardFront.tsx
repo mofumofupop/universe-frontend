@@ -24,7 +24,7 @@ export function CardFront({ user }: UserCardProps) {
           </div>
           
           <div className="flex flex-col w-full max-w-80 min-w-[200px]">
-            <div className="flex flex-col gap-2"> 
+            <div className="flex flex-col gap-2 items-start text-left"> 
               <p className="text-[clamp(16px,10cqw,30px)] font-bold leading-tight">{user.name}</p>
               <p className="text-[clamp(12px,2.5cqw,16px)] leading-tight">{user.affiliation}</p>
             </div>
