@@ -1,5 +1,6 @@
 import { User } from "@/types/User";
 import { CardFront } from "@/components/CardFront";
+import { CardBack } from "@/components/CardBack";
 
 export default function Home() {
   // 本来はここで fetch などをしますが、まずは固定データを作ります
@@ -7,7 +8,6 @@ export default function Home() {
     id: "1",
     username: "onnenai_w57",
     name: "Onnenai",
-    // デザインのように複数行にしたい場合は改行コード(\n)を入れます
     affiliation: "Project Manager / Frontend\nEngineer / Composer / DJ",
   
     icon_url: "https://links.onnenai.cc/images/icon.png", 
@@ -22,8 +22,13 @@ export default function Home() {
 
   return (
     <div className="flex items-center flex-col mt-8">
-      <div className="p-4">
-        <CardFront user={demoUser} />
+      <div className="p-4 gap-4">
+        <div className="mb-8 text-center">
+          <CardFront user={demoUser} />
+        </div>
+        <div className="mb-8 text-center">
+          <CardBack user={demoUser} />
+        </div>
       </div>
     </div>
   );
