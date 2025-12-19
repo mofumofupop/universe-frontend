@@ -21,7 +21,7 @@ export const SocialIcon = ({ url, className = '' }: SocialIconProps) => {
     return { icon: 'lucide:link'}; // 未知のリンク
   };
 
-  const commonClasses = `relative inline-flex items-center justify-center w-full h-full group hover:scale-110 transition-transform duration-300 ${className}`;
+  const commonClasses = `relative inline-flex items-center justify-center w-full h-full group hover:scale-110 transition-transform duration-300 ${className} [backface-visibility:hidden] [transform-style:preserve-3d]`;
 
   if (!url) {
     return (
