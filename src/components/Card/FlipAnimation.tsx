@@ -9,6 +9,8 @@ import { motion } from "framer-motion";
 export default function FlipAnimation({ user }: { user: User }) {
   const [rotation, setRotation] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  // 裏面が表示されているかどうか（180度以上回転しているか）
+  const isBackActive = (rotation % 360) >= 90 && (rotation % 360) < 270;
 
   const handleFlip = () => {
     if (!isAnimating) {
@@ -33,7 +35,7 @@ export default function FlipAnimation({ user }: { user: User }) {
 
         <div className="absolute inset-0 h-full w-full [backface-visibility:hidden] [transform:rotateY(180deg)]">
           <div className="w-full h-full max-w-none shadow-none">
-            <CardBack user={user} onFlip={handleFlip} />
+            <CardBack user={user} onFlip={handleFlip} isActive={isBackActive} />
           </div>
         </div>
       </motion.div>

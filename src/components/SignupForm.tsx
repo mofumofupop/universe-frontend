@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { register, uploadIcon } from "@/lib/api";
 
 const Logo = ({ className }: { className?: string }) => (
   <svg className={`${className} fill-current`} viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
@@ -27,16 +29,21 @@ interface SignupFormProps {
 }
 
 export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
+  const router = useRouter();
   const [iconPreview, setIconPreview] = useState<string | null>(null);
+  const [iconFile, setIconFile] = useState<File | null>(null);
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [affiliation, setAffiliation] = useState("");
   const [socialLinks, setSocialLinks] = useState<string[]>(["", "", "", "", ""]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setIconFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setIconPreview(reader.result as string);
@@ -51,17 +58,57 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
     setSocialLinks(newLinks);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // サインアップ処理は今は実装しない
-    const filteredSocialLinks = socialLinks.filter(link => link.trim() !== "");
-    console.log("Signup attempt:", { 
-      username, 
-      name, 
-      password, 
-      affiliation, 
-      social_links: filteredSocialLinks 
-    });
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      // パスワードをSHA-256でハッシュ化
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      const filteredSocialLinks = socialLinks.filter(link => link.trim() !== "");
+      
+      if (filteredSocialLinks.length === 0) {
+        throw new Error("少なくとも1つのSocial Linkを入力してください");
+      }
+
+      // ユーザー登録
+      const registerResult = await register(
+        username,
+        passwordHash,
+        name || undefined,
+        affiliation || undefined,
+        filteredSocialLinks
+      );
+
+      // アイコンがある場合はアップロード
+      if (iconFile && registerResult.id) {
+        try {
+          await uploadIcon(registerResult.id, passwordHash, iconFile);
+        } catch (iconErr) {
+          console.error("Icon upload failed:", iconErr);
+          // アイコンアップロード失敗は登録自体は成功しているので警告のみ
+          // エラーは表示するが、登録は成功として扱う
+        }
+      }
+
+      // 成功したらsparkleページへリダイレクト
+      router.push("/sparkle");
+    } catch (err) {
+      console.error("Signup error:", err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("登録に失敗しました");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -94,6 +141,11 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
       </CardHeader>
       
       <CardContent className="px-6 pb-6">
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-3">
           {/* Icon Upload Area */}
           <div className="flex justify-center my-3">
@@ -214,8 +266,9 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
             <Button 
               type="submit" 
               className="bg-slate-900 hover:bg-slate-800 text-white px-8"
+              disabled={isSubmitting}
             >
-              Sign up
+              {isSubmitting ? "Signing up..." : "Sign up"}
             </Button>
           </div>
         </form>

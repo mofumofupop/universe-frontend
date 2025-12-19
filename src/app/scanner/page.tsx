@@ -4,13 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import QRScanner from "@/components/QRScanner";
 import { Button } from "@/components/ui/button";
-import { exchangeBusinessCard, getAuthFromStorage, type ExchangeResponse } from "@/lib/api";
+import { exchangeBusinessCard, getAuthFromStorage, getUser, type ExchangeResponse } from "@/lib/api";
 import Header from "@/components/Header";
 import FlipAnimation from "@/components/Card/FlipAnimation";
 import { User } from "@/types/User";
 
 export default function ScannerPage() {
-  const [scannedData, setScannedData] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [exchangeResult, setExchangeResult] = useState<ExchangeResponse | null>(null);
@@ -25,7 +24,6 @@ export default function ScannerPage() {
   }, []);
 
   const handleScan = async (decodedText: string) => {
-    setScannedData(decodedText);
     setIsProcessing(true);
     setError(null);
     setExchangeResult(null);
@@ -49,17 +47,31 @@ export default function ScannerPage() {
         setExchangeResult(data);
         setShowScanner(false);
         
-        // 相手のユーザー情報を取得（API呼び出しが必要な場合）
-        // ここではダミーデータを作成
-        const user: User = {
-          id: data.new.id,
-          username: data.new.username,
-          name: data.new.username,
-          affiliation: "Exchange Partner",
-          icon_url: "",
-          social_links: [],
-        };
-        setExchangedUser(user);
+        // 相手のユーザー情報を取得
+        try {
+          const userData = await getUser(data.new.id, userId, passwordHash);
+          const user: User = {
+            id: userData.id,
+            username: userData.username,
+            name: userData.username, // nameがないのでusernameを使用
+            affiliation: userData.affiliation || "",
+            icon_url: userData.icon_url || "",
+            social_links: userData.social_links || [],
+          };
+          setExchangedUser(user);
+        } catch (userErr) {
+          console.error("Failed to fetch user data:", userErr);
+          // ユーザー情報取得に失敗してもexchange自体は成功しているので基本情報だけ表示
+          const user: User = {
+            id: data.new.id,
+            username: data.new.username,
+            name: data.new.username,
+            affiliation: "",
+            icon_url: "",
+            social_links: [],
+          };
+          setExchangedUser(user);
+        }
       } else {
         // エラーハンドリング
         setError(data.message || "名刺交換に失敗しました");
@@ -77,9 +89,9 @@ export default function ScannerPage() {
   };
 
   const handleReset = () => {
-    setScannedData(null);
     setError(null);
     setExchangeResult(null);
+    setExchangedUser(null);
     setShowScanner(true);
   };
 

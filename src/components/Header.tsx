@@ -49,7 +49,7 @@ export default function Header({ children, className }: HeaderProps) {
       <div className="w-full flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center -ml-8">
-          <Logo className="h-20 w-auto" />
+          <Logo className="h-20 w-auto text-white" />
         </div>
 
         {/* Children and Auth Buttons */}
