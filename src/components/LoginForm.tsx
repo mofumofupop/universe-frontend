@@ -1,16 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { LoginForm } from "./LoginForm";
-
-interface HeaderProps {
-  children?: React.ReactNode;
-  className?: string;
-}
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Logo = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" className={`${className} fill-current`}>
+  <svg className={`${className} fill-current`} viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
     <g>
       <path d="M539.02,687.82l22.18,46.06h.29l22.46-46.06h22.46l-35.14,60.79h-20.59l-34.85-60.79h23.18Z"/>
       <path d="M798.51,687.82v10.75h-54.86v12.79h50.4v10.75h-50.4v15.75h57.31v10.75h-78.48v-60.79h76.03Z"/>
@@ -25,36 +22,78 @@ const Logo = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default function Header({ children, className }: HeaderProps) {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
+export function LoginForm() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // ログイン処理は今は実装しない
+    console.log("Login attempt:", { username, password });
+  };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 w-full bg-gradient-to-b from-gray-900 to-gray-900/50 pl-8 pr-8 py-0 z-50 ${className || ''}`}>
-      <div className="w-full flex items-center justify-between">
+    <Card className="w-[90vw] sm:w-full sm:max-w-md bg-slate-50 border-none shadow-lg font-inter">
+      <CardHeader className="space-y-1.5 pt-2 pb-2">
         {/* Logo */}
-        <div className="flex items-center -ml-8">
-          <Logo className="h-20 w-auto" />
+        <div className="flex justify-end mb-0 -mr-4">
+          <Logo className="h-20 w-auto text-slate-400 opacity-40" />
         </div>
-
-        {/* Children and Login Button */}
-        <div className="flex items-center gap-4 relative">
-          {children}
+        
+        <CardTitle className="text-xl font-semibold text-slate-900">
+          Login to your account
+        </CardTitle>
+        <CardDescription className="text-sm text-slate-600">
+          Enter your ID below to login to your account
+        </CardDescription>
+        <p className="text-xs text-slate-500">
+          Don&apos;t have an account yet?{" "}
+          <a href="#" className="text-slate-700 hover:underline">
+            Create account <span className="text-slate-400">here</span>
+          </a>
+        </p>
+      </CardHeader>
+      
+      <CardContent className="px-4 pb-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="username" className="text-sm font-medium text-slate-900">
+              Username
+            </Label>
+            <Input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="bg-white border-slate-300 focus:border-slate-500"
+              required
+            />
+          </div>
           
-          <Button 
-            className="bg-white hover:bg-gray-100 text-gray-900 rounded-md px-6 py-2 font-medium border-none"
-            onClick={() => setIsLoginOpen(!isLoginOpen)}
-          >
-            Log in
-          </Button>
-
-          {/* Login Form Dropdown */}
-          {isLoginOpen && (
-            <div className="fixed left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2 z-50">
-              <LoginForm />
-            </div>
-          )}
-        </div>
-      </div>
-    </header>
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="text-sm font-medium text-slate-900">
+              Password
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="bg-white border-slate-300 focus:border-slate-500"
+              required
+            />
+          </div>
+          
+          <div className="flex justify-end mt-4">
+            <Button 
+              type="submit" 
+              className="bg-slate-900 hover:bg-slate-800 text-white px-8"
+            >
+              Log in
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
