@@ -30,6 +30,7 @@ export interface ExchangeResponse extends ApiResponse {
   new: {
     id: string;
     username: string;
+    name: string;
   } | null;
 }
 

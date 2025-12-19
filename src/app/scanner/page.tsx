@@ -32,15 +32,9 @@ export default function ScannerPage() {
       // ローカルストレージからユーザー情報を取得
       const { userId, passwordHash } = getAuthFromStorage();
 
-      if (!userId || !passwordHash) {
-        setError("ログインが必要です");
-        // ログインページへリダイレクト
-        router.push("/login");
-        return;
-      }
 
       // API呼び出し
-      const data = await exchangeBusinessCard(userId, passwordHash, decodedText);
+      const data = await exchangeBusinessCard(userId || "", passwordHash || "", decodedText);
 
       if (data.success && data.new) {
         // 成功時の処理：結果を保存して表示
@@ -49,11 +43,11 @@ export default function ScannerPage() {
         
         // 相手のユーザー情報を取得
         try {
-          const userData = await getUser(data.new.id, userId, passwordHash);
+          const userData = await getUser(data.new.id, userId || "", passwordHash || "");
           const user: User = {
             id: userData.id,
             username: userData.username,
-            name: userData.username, // nameがないのでusernameを使用
+            name: userData.name || userData.username,
             affiliation: userData.affiliation || "",
             icon_url: userData.icon_url || "",
             social_links: userData.social_links || [],
@@ -65,7 +59,7 @@ export default function ScannerPage() {
           const user: User = {
             id: data.new.id,
             username: data.new.username,
-            name: data.new.username,
+            name: data.new.name || data.new.username,
             affiliation: "",
             icon_url: "",
             social_links: [],
