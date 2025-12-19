@@ -8,13 +8,14 @@ import { Star } from "./Star";
 
 interface UserCardProps {
   user: User;
+  onFlip?: () => void;
 }
 
 const qr: QRcode = { success: "true", qr: "https://links.onnenai.cc/" };
 
-export function CardBack({ user }: UserCardProps) {
+export function CardBack({ user, onFlip }: UserCardProps) {
   return (
-    <div className="@container w-full max-w-lg min-w-[320px] aspect-[1.62/1] mx-auto font-inter rounded-lg shadow-md p-[5%] flex flex-col justify-center bg-slate-50 relative">
+    <div className="@container w-full min-w-[300px] aspect-[1.62/1] mx-auto font-inter rounded-lg shadow-md p-[5%] flex flex-col justify-center bg-slate-50 relative">
       <div className="absolute w-[13%] h-[13%] top-[20%] left-[15%] text-slate-400">
         <Star />
       </div>
@@ -29,7 +30,10 @@ export function CardBack({ user }: UserCardProps) {
       <p className="text-[clamp(8px,2cqw,12px)] text-slate-400 flex justify-center absolute z-10 bottom-[5%] left-1/2 -translate-x-1/2">
         @{user.username}
       </p>
-      <CardEdge className="absolute bottom-[5%] right-[5%] text-slate-400 cursor-pointer" />
+      <CardEdge 
+        className="absolute bottom-[5%] right-[5%] text-slate-400 cursor-pointer" 
+        onClick={onFlip} 
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { User } from "@/types/User";
 import { CardFront } from "@/components/CardFront";
 import { CardBack } from "@/components/CardBack";
+import FlipAnimation from "@/components/FlipAnimation";
 
 export default function Sparkle() {
   // デモデータ
@@ -22,13 +23,14 @@ export default function Sparkle() {
 
   return (
     <div className="flex items-center flex-col mt-8">
-      <div className="p-4 gap-4">
-        <div className="mb-8 text-center">
+      <div className="w-full p-4 gap-4">
+        <FlipAnimation user={demoUser} />
+        {/* <div>
           <CardFront user={demoUser} />
         </div>
-        <div className="mb-8 text-center">
+        <div>
           <CardBack user={demoUser} />
-        </div>
+        </div> */}
       </div>
     </div>
   );
