@@ -22,7 +22,11 @@ const Logo = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export function LoginForm() {
+interface LoginFormProps {
+  onSwitchToSignup?: () => void;
+}
+
+export function LoginForm({ onSwitchToSignup }: LoginFormProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -48,9 +52,16 @@ export function LoginForm() {
         </CardDescription>
         <p className="text-xs text-slate-500">
           Don&apos;t have an account yet?{" "}
-          <a href="#" className="text-slate-700 hover:underline">
+          <button 
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              onSwitchToSignup?.();
+            }}
+            className="text-slate-700 hover:underline"
+          >
             Create account <span className="text-slate-400">here</span>
-          </a>
+          </button>
         </p>
       </CardHeader>
       
