@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LoginForm } from "./LoginForm";
+import { SignupForm } from "./SignupForm";
 
 interface HeaderProps {
   children?: React.ReactNode;
@@ -26,7 +27,22 @@ const Logo = ({ className }: { className?: string }) => (
 );
 
 export default function Header({ children, className }: HeaderProps) {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [formType, setFormType] = useState<'login' | 'signup'>('login');
+
+  const openLoginForm = () => {
+    setFormType('login');
+    setIsFormOpen(true);
+  };
+
+  const openSignupForm = () => {
+    setFormType('signup');
+    setIsFormOpen(true);
+  };
+
+  const closeForm = () => {
+    setIsFormOpen(false);
+  };
 
   return (
     <header className={`fixed top-0 left-0 right-0 w-full bg-gradient-to-b from-gray-900 to-gray-900/50 pl-8 pr-8 py-0 z-50 ${className || ''}`}>
@@ -36,21 +52,38 @@ export default function Header({ children, className }: HeaderProps) {
           <Logo className="h-20 w-auto" />
         </div>
 
-        {/* Children and Login Button */}
-        <div className="flex items-center gap-4 relative">
+        {/* Children and Auth Buttons */}
+        <div className="flex items-center gap-3 relative">
           {children}
           
           <Button 
+            variant="outline"
+            className="bg-slate-700 hover:bg-slate-600 text-white border-slate-600 rounded-md px-6 py-2 font-medium"
+            onClick={openSignupForm}
+          >
+            Sign up
+          </Button>
+
+          <Button 
             className="bg-white hover:bg-gray-100 text-gray-900 rounded-md px-6 py-2 font-medium border-none"
-            onClick={() => setIsLoginOpen(!isLoginOpen)}
+            onClick={openLoginForm}
           >
             Log in
           </Button>
 
-          {/* Login Form Dropdown */}
-          {isLoginOpen && (
-            <div className="fixed left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2 z-50">
-              <LoginForm />
+          {/* Form Display */}
+          {isFormOpen && (
+            <div 
+              className="fixed inset-0 z-40 flex items-start justify-center pt-24 pb-8 overflow-y-auto"
+              onClick={closeForm}
+            >
+              <div className="my-auto" onClick={(e) => e.stopPropagation()}>
+                {formType === 'login' ? (
+                  <LoginForm onSwitchToSignup={openSignupForm} />
+                ) : (
+                  <SignupForm onSwitchToLogin={openLoginForm} />
+                )}
+              </div>
             </div>
           )}
         </div>
