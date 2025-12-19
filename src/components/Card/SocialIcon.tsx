@@ -17,7 +17,7 @@ export const SocialIcon = ({ url, className = '' }: SocialIconProps) => {
     if (lowerUrl.includes('twitter.com') || lowerUrl.includes('x.com')) return { icon: 'ri:twitter-x-fill' };
     if (lowerUrl.includes('instagram.com')) return { icon: 'mdi:instagram' };
     if (lowerUrl.includes('github.com')) return { icon: 'mdi:github' };
-    if (lowerUrl.includes('discord.gg') || lowerUrl.includes('discordapp.com')) return { icon: 'ic:baseline-discord' };
+    if (/discord(\.gg|\.com|app\.com|app\.net)/.test(lowerUrl)) return { icon: 'ic:baseline-discord' };
     return { icon: 'lucide:link'}; // 未知のリンク
   };
 

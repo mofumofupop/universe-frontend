@@ -10,14 +10,18 @@ import { generateQRCode, getAuthFromStorage } from "@/lib/api";
 interface UserCardProps {
   user: User;
   onFlip?: () => void;
+  isActive?: boolean;
 }
 
-export function CardBack({ user, onFlip }: UserCardProps) {
+export function CardBack({ user, onFlip, isActive }: UserCardProps) {
   const [qrCode, setQrCode] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // 裏面がアクティブになったときのみQRコードを生成
+    if (!isActive) return;
+
     async function fetchQRCode() {
       try {
         const { userId, passwordHash } = getAuthFromStorage();
@@ -40,7 +44,7 @@ export function CardBack({ user, onFlip }: UserCardProps) {
     }
 
     fetchQRCode();
-  }, []);
+  }, [isActive]);
 
   return (
     <div className="@container w-full min-w-[300px] aspect-[1.62/1] mx-auto font-inter rounded-lg shadow-md p-[5%] flex flex-col justify-center bg-slate-50 relative">
