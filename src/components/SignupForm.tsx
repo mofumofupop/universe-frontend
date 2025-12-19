@@ -100,6 +100,7 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
             <label htmlFor="icon-upload" className="cursor-pointer">
               <div className="w-20 h-20 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden border-2 border-slate-300 hover:border-slate-400 transition-colors">
                 {iconPreview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={iconPreview} alt="Icon preview" className="w-full h-full object-cover" />
                 ) : (
                   <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
