@@ -17,14 +17,66 @@ interface SocialIconProps {
 
 export const SocialIcon = ({ url, className = "" }: SocialIconProps) => {
   const getIconInfo = (linkUrl: string) => {
-    const lowerUrl = linkUrl.toLowerCase();
-    if (lowerUrl.includes("twitter.com") || lowerUrl.includes("x.com"))
-      return { icon: "ri:twitter-x-fill" };
-    if (lowerUrl.includes("instagram.com")) return { icon: "mdi:instagram" };
-    if (lowerUrl.includes("github.com")) return { icon: "mdi:github" };
-    if (/discord(\.gg|\.com|app\.com|app\.net)/.test(lowerUrl))
-      return { icon: "ic:baseline-discord" };
-    return { icon: "lucide:link" }; // 未知のリンク
+    // Normalize and extract hostname safely
+    let hostname = "";
+    try {
+      const parsed = new URL(linkUrl.includes("://") ? linkUrl : `https://${linkUrl}`);
+      hostname = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+    } catch {
+      // Fallback: strip protocol and www then take up to first slash
+      const s = linkUrl.replace(/^https?:\/\//i, "").replace(/^www\./i, "").toLowerCase();
+      hostname = s.split("/")[0];
+    }
+
+    const patterns: Array<{ regex: RegExp; icon: string }> = [
+      { regex: /(^|\.)x\.com$/i, icon: "ri:twitter-x-fill" },
+      { regex: /(^|\.)twitter\.com$/i, icon: "ri:twitter-x-fill" },
+      { regex: /(^|\.)instagram\.com$/i, icon: "mdi:instagram" },
+      { regex: /(^|\.)github\.com$/i, icon: "mdi:github" },
+      { regex: /(^|\.)discord(?:\.gg|\.com|app\.com|app\.net)$/i, icon: "ic:baseline-discord" },
+      { regex: /(^|\.)soundcloud\.com$/i, icon: "mdi:soundcloud" },
+      { regex: /(^|\.)youtube\.com$|(^|\.)youtu\.be$/i, icon: "mdi:youtube" },
+      { regex: /(^|\.)spotify\.com$/i, icon: "mdi:spotify" },
+      { regex: /(^|\.)t\.me$|(^|\.)telegram\.me$|(^|\.)telegram\.org$/i, icon: "mdi:telegram" },
+      { regex: /(^|\.)linkedin\.com$/i, icon: "mdi:linkedin" },
+      { regex: /(^|\.)patreon\.com$/i, icon: "simple-icons:patreon" },
+      { regex: /(^|\.)buymeacoffee\.com$/i, icon: "simple-icons:buymeacoffee" },
+      { regex: /(^|\.)gumroad\.com$/i, icon: "simple-icons:gumroad" },
+      { regex: /(^|\.)paypal\.com$/i, icon: "simple-icons:paypal" },
+      { regex: /(^|\.)medium\.com$/i, icon: "simple-icons:medium" },
+      { regex: /(^|\.)substack\.com$/i, icon: "simple-icons:substack" },
+      { regex: /(^|\.)wordpress\.(com|org)$/i, icon: "simple-icons:wordpress" },
+      { regex: /(^|\.)ghost\.org$/i, icon: "simple-icons:ghost" },
+      { regex: /(^|\.)vimeo\.com$/i, icon: "simple-icons:vimeo" },
+      { regex: /(^|\.)dribbble\.com$/i, icon: "simple-icons:dribbble" },
+      { regex: /(^|\.)behance\.net$/i, icon: "simple-icons:behance" },
+      { regex: /(^|\.)artstation\.com$/i, icon: "simple-icons:artstation" },
+      { regex: /(^|\.)gitlab\.com$/i, icon: "simple-icons:gitlab" },
+      { regex: /(^|\.)stackoverflow\.com$/i, icon: "simple-icons:stackoverflow" },
+      { regex: /(^|\.)reddit\.com$/i, icon: "simple-icons:reddit" },
+      { regex: /(^|\.)producthunt\.com$/i, icon: "simple-icons:producthunt" },
+      { regex: /(^|\.)ycombinator\.com$/i, icon: "simple-icons:ycombinator" },
+      { regex: /(^|\.)line\.me$/i, icon: "simple-icons:line" },
+      { regex: /(^|\.)bilibili\.com$/i, icon: "simple-icons:bilibili" },
+      { regex: /(^|\.)niconico\.(jp|com)$/i, icon: "simple-icons:niconico" },
+      { regex: /(^|\.)pixiv\.net$/i, icon: "simple-icons:pixiv" },
+      { regex: /(^|\.)steam(?:$|\.|\/)/i, icon: "simple-icons:steam" },
+      { regex: /(^|\.)xbox\.com$/i, icon: "simple-icons:xbox" },
+      { regex: /(^|\.)pixiv\.me$/i, icon: "simple-icons:pixiv" },
+      { regex: /(^|\.)fanbox\.cc$/i, icon: "simple-icons:pixiv" },
+      { regex: /(^|\.)booth\.pm$/i, icon: "simple-icons:pixiv" },
+      { regex: /(^|\.)((bsky\.social)|(bluesky\.org))$/i, icon: "simple-icons:bluesky" },
+      { regex: /(^|\.)twitch\.tv$/i, icon: "mdi:twitch" },
+      { regex: /(^|\.)mastodon(\.|$)/i, icon: "mdi:mastodon" },
+      { regex: /(^|\.)misskey(\.|$)/i, icon: "simple-icons:misskey" },
+      { regex: /(^|\.)progate\.com$/i, icon: "simple-icons:progate" },
+    ];
+
+    for (const p of patterns) {
+      if (p.regex.test(hostname)) return { icon: p.icon };
+    }
+
+    return { icon: "lucide:link" };
   };
 
   const commonClasses = `relative inline-flex items-center justify-center w-full h-full group hover:scale-110 transition-transform duration-300 ${className} [backface-visibility:hidden] [transform-style:preserve-3d]`;
