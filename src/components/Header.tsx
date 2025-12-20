@@ -74,8 +74,8 @@ export default function Header({ children, className }: HeaderProps) {
     <header className={`fixed top-0 left-0 right-0 w-full bg-gradient-to-b from-gray-900 to-gray-900/50 pl-8 pr-8 py-0 z-50 ${className || ''}`}>
       <div className="w-full flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center -ml-8">
-          <Logo className="h-20 w-auto text-white" />
+        <div className="flex items-center -ml-4 pl-6 pr-6 py-3">
+          <Logo className="h-10 w-auto text-white" />
         </div>
 
         {/* Children and Auth Buttons */}

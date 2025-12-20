@@ -313,6 +313,46 @@ export async function login(
 }
 
 /**
+ * ID での自動ログイン用ヘルパー
+ * バックエンドが ID (UUID) を受け付ける場合に使用します。
+ */
+export async function loginById(
+  id: string,
+  passwordHash: string
+): Promise<LoginResponse> {
+  try {
+    console.log('API: loginById called', { id, passwordHashMask: `${passwordHash.slice(0,6)}...` });
+
+    const response = await fetch(`${API_BASE_URL}/api/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id, password_hash: passwordHash }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "ログインに失敗しました");
+    }
+
+    // ログイン成功時にローカルストレージに保存
+    saveAuthToStorage(data.id, passwordHash);
+
+    return data;
+  } catch (error) {
+    console.error("LoginById API Error:", error);
+    if (error instanceof TypeError && error.message === "Failed to fetch") {
+      throw new Error(
+        `バックエンドサーバーに接続できません。${API_BASE_URL} が起動しているか確認してください。`
+      );
+    }
+    throw error;
+  }
+}
+
+/**
  * 自分のアカウント情報を取得
  * @param userId ユーザーのUUID
  * @param passwordHash SHA-256でハッシュ化されたパスワード
@@ -323,6 +363,8 @@ export async function getAccount(
   passwordHash: string
 ): Promise<AccountResponse> {
   try {
+    console.log('API: getAccount called', { userId, passwordHashMask: `${passwordHash.slice(0,6)}...` });
+
     const response = await fetch(`${API_BASE_URL}/api/account`, {
       method: "POST",
       headers: {
