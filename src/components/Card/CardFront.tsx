@@ -16,7 +16,7 @@ export function CardFront({ user, onFlip }: UserCardProps) {
       <div className="flex flex-col h-full justify-center">
         <div className="flex items-center gap-[5%] justify-center flex-grow pl-[10%] pr-[5%] pt-[2%] pb-[4%]">
           <div className="w-[28%] max-w-24 aspect-square shrink-0">
-            <Avatar className="w-full h-full shadow-md pl-[5%]">
+            <Avatar className="w-full h-full shadow-md">
               <AvatarImage src={user.icon_url} alt={user.name} />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
