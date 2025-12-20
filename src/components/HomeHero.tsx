@@ -46,7 +46,7 @@ export default function HomeHero() {
         <div className="flex flex-col md:flex-row items-center gap-6 py-6">
           <div className="w-full md:w-1/2">
             <div className="w-full max-w-none -mx-4 px-4">
-              <h3 className="text-4xl md:text-5xl font-semibold leading-tight text-left">
+              <h3 className="text-4xl md:text-5xl leading-tight text-left">
                 <span className="block">Easy to create</span>
                 <span className="block">your profile.</span>
               </h3>
@@ -70,7 +70,7 @@ export default function HomeHero() {
         <div className="flex flex-col md:flex-row items-start gap-6 py-6">
           <div className="w-full md:w-1/2 md:pr-8 text-left">
             <div className="w-full max-w-none -mx-4 px-4">
-              <h3 className="text-4xl md:text-5xl font-semibold leading-tight">
+              <h3 className="text-4xl md:text-5xl leading-tight">
                 <span className="block">Smart exchange</span>
                 <span className="block">profile cards.</span>
               </h3>
@@ -114,7 +114,7 @@ export default function HomeHero() {
 
       {/* Universe / Friends */}
       <div className="container mx-auto px-4 mt-12 text-center">
-        <h3 className="text-xl font-semibold">And the universe expands.</h3>
+        <h3 className="text-xl">And the universe expands.</h3>
         <p className="mt-3 text-gray-300">Exchanging profile cards expands your universe. Tap a friend&apos;s card to check their profile and connect in real life.</p>
         <div className="mt-6 flex justify-center gap-6 items-center flex-wrap -mx-4 md:mx-0">
           <div className="w-full md:w-1/2 px-4 md:px-0 flex justify-start">
@@ -127,7 +127,7 @@ export default function HomeHero() {
       </div>
 
       <div className="container mx-auto px-4 mt-20 text-center">
-        <h3 className="text-lg font-semibold">Let&apos;s get started.</h3>
+        <h3 className="text-lg">Let&apos;s get started.</h3>
         <div className="mt-6 flex justify-center gap-3">
           <button onClick={() => window.dispatchEvent(new CustomEvent('openAuth', { detail: { type: 'signup' } }))} className="inline-flex items-center gap-2 bg-slate-700 text-white px-6 py-3 rounded"><span>Sign up</span><ArrowRight size={16} /></button>
           <button onClick={() => window.dispatchEvent(new CustomEvent('openAuth', { detail: { type: 'login' } }))} className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded"><span>Log in</span><ArrowRight size={16} /></button>

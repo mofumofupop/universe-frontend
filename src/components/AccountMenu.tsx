@@ -9,7 +9,11 @@ interface MenuProps {
   iconClassName?: string;
 }
 
-export default function AccountMenu({ onLogout, buttonClassName, iconClassName }: MenuProps) {
+export default function AccountMenu({
+  onLogout,
+  buttonClassName,
+  iconClassName,
+}: MenuProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -29,7 +33,9 @@ export default function AccountMenu({ onLogout, buttonClassName, iconClassName }
   return (
     <div ref={containerRef} className="relative inline-block text-left">
       <button
-        className={`p-2 rounded-full focus:outline-none inline-flex items-center justify-center ${buttonClassName || ""}`}
+        className={`p-2 rounded-full focus:outline-none inline-flex items-center justify-center ${
+          buttonClassName || ""
+        }`}
         onClick={() => setOpen((v) => !v)}
         aria-label="Open menu"
         aria-expanded={open}
@@ -39,20 +45,26 @@ export default function AccountMenu({ onLogout, buttonClassName, iconClassName }
           <Menu
             size={20}
             className={`absolute inset-0 m-auto transition-transform duration-200 ease-in-out ${
-              open ? "opacity-0 scale-90 -rotate-90" : "opacity-100 scale-100 rotate-0"
+              open
+                ? "opacity-0 scale-90 -rotate-90"
+                : "opacity-100 scale-100 rotate-0"
             } ${iconClassName || "text-slate-700"}`}
           />
           <X
             size={20}
             className={`absolute inset-0 m-auto transition-transform duration-200 ease-in-out ${
-              open ? "opacity-100 scale-100 rotate-0" : "opacity-0 scale-90 rotate-90"
+              open
+                ? "opacity-100 scale-100 rotate-0"
+                : "opacity-0 scale-90 rotate-90"
             } ${iconClassName || "text-slate-700"}`}
           />
         </span>
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black/10 z-50 border border-slate-300 overflow-hidden">
-          <div className="px-6 py-3 font-bold text-lg text-slate-800">My Account</div>
+        <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black/10 z-[9999] border border-slate-300 overflow-hidden">
+          <div className="px-6 py-3 font-bold text-lg text-slate-800">
+            My Account
+          </div>
           <div className="border-t border-slate-200" />
           <button className="flex items-center gap-2 px-6 py-3 w-full text-slate-800 hover:bg-slate-100 first:rounded-t-lg last:rounded-b-lg">
             <User size={18} /> <span>Profile</span>
