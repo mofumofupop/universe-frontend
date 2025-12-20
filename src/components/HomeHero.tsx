@@ -22,7 +22,7 @@ export default function HomeHero() {
         <div className="mt-8 flex justify-center gap-3">
           <Link href="/scanner" className="inline-flex items-center bg-white text-gray-900 rounded-md px-5 py-1 font-medium shadow">
             <Scan size={16} />
-            <span>Scan Now</span>
+            <span> Scan Now</span>
           </Link>
           <Button onClick={() => window.dispatchEvent(new CustomEvent('openAuth', { detail: { type: 'signup' } }))} className="bg-slate-700 text-white rounded-md px-5 py-2 font-medium">
             <span>Sign up</span>

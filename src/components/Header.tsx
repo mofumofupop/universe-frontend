@@ -21,7 +21,7 @@ interface HeaderProps {
 
 export default function Header({ children, className }: HeaderProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [formType, setFormType] = useState<'login' | 'signup'>('login');
+  const [formType, setFormType] = useState<"login" | "signup">("login");
   const isLoggedIn = useIsLoggedIn();
   const router = useRouter();
   const pathname = usePathname();
@@ -36,14 +36,13 @@ export default function Header({ children, className }: HeaderProps) {
     }
   };
 
-
   const openLoginForm = () => {
-    setFormType('login');
+    setFormType("login");
     setIsFormOpen(true);
   };
 
   const openSignupForm = () => {
-    setFormType('signup');
+    setFormType("signup");
     setIsFormOpen(true);
   };
 
@@ -54,13 +53,14 @@ export default function Header({ children, className }: HeaderProps) {
   // Listen for global openAuth events from other components (e.g., HomeHero)
   useEffect(() => {
     const handler = (e: Event) => {
-      const ce = e as CustomEvent<{ type: 'login' | 'signup' }>;
+      const ce = e as CustomEvent<{ type: "login" | "signup" }>;
       if (!ce?.detail) return;
-      if (ce.detail.type === 'login') openLoginForm();
-      if (ce.detail.type === 'signup') openSignupForm();
+      if (ce.detail.type === "login") openLoginForm();
+      if (ce.detail.type === "signup") openSignupForm();
     };
-    window.addEventListener('openAuth', handler as EventListener);
-    return () => window.removeEventListener('openAuth', handler as EventListener);
+    window.addEventListener("openAuth", handler as EventListener);
+    return () =>
+      window.removeEventListener("openAuth", handler as EventListener);
   }, []);
 
   const handleLogout = () => {
@@ -71,7 +71,11 @@ export default function Header({ children, className }: HeaderProps) {
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 w-full bg-gradient-to-b from-gray-900 to-gray-900/50 pl-8 pr-8 py-0 z-50 ${className || ''}`}>
+    <header
+      className={`fixed top-0 left-0 right-0 w-full bg-gradient-to-b from-gray-900 to-gray-900/50 pl-8 pr-8 py-0 z-[9999] ${
+        className || ""
+      }`}
+    >
       <div className="w-full flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center -ml-4 pl-6 pr-6 py-3">
@@ -96,7 +100,13 @@ export default function Header({ children, className }: HeaderProps) {
                   })()}
                 </span>
               </button>
-              {isLoggedIn === true && <AccountMenu onLogout={handleLogout} buttonClassName="" iconClassName="text-white" />}
+              {isLoggedIn === true && (
+                <AccountMenu
+                  onLogout={handleLogout}
+                  buttonClassName=""
+                  iconClassName="text-white"
+                />
+              )}
             </div>
           ) : isLoggedIn === true ? (
             <>
@@ -111,18 +121,22 @@ export default function Header({ children, className }: HeaderProps) {
                 </span>
               </button>
               {/* Account Menu (no frame, white icon) */}
-              <AccountMenu onLogout={handleLogout} buttonClassName="" iconClassName="text-white" />
+              <AccountMenu
+                onLogout={handleLogout}
+                buttonClassName=""
+                iconClassName="text-white"
+              />
             </>
           ) : isLoggedIn === false ? (
             <>
-              <Button 
+              <Button
                 variant="outline"
                 className="bg-slate-700 hover:bg-slate-600 text-white border-slate-600 rounded-md px-6 py-2 font-medium"
                 onClick={openSignupForm}
               >
                 Sign up
               </Button>
-              <Button 
+              <Button
                 className="bg-white hover:bg-gray-100 text-gray-900 rounded-md px-6 py-2 font-medium border-none"
                 onClick={openLoginForm}
               >
@@ -137,17 +151,21 @@ export default function Header({ children, className }: HeaderProps) {
                   <Scan size={20} />
                 </span>
               </button>
-              <AccountMenu onLogout={() => {}} buttonClassName="pointer-events-none" iconClassName="opacity-0" />
+              <AccountMenu
+                onLogout={() => {}}
+                buttonClassName="pointer-events-none"
+                iconClassName="opacity-0"
+              />
             </>
           )}
           {/* Form Display */}
           {isFormOpen && (
-            <div 
+            <div
               className="fixed inset-0 z-40 flex items-start justify-center pt-24 pb-8 overflow-y-auto"
               onClick={closeForm}
             >
               <div className="my-auto" onClick={(e) => e.stopPropagation()}>
-                {formType === 'login' ? (
+                {formType === "login" ? (
                   <LoginForm onSwitchToSignup={openSignupForm} />
                 ) : (
                   <SignupForm onSwitchToLogin={openLoginForm} />
