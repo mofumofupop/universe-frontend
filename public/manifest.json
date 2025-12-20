@@ -1,7 +1,7 @@
 {
   "name": "U'n'IVERSE",
   "short_name": "U'n'IVERSE",
-  "description": "U'n'IVERSE アプリの説明文をここに入れます",
+  "description": "Create your own profile card easily and share it with the people you meet to expand your universe.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

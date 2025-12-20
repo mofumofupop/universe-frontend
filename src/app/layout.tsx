@@ -26,11 +26,18 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata = {
+  title: "U'n'IVERSE",
+  description: "U'n'IVERSE — Create your own profile card easily and share it with the people you meet to expand your universe.",
   icons: {
     icon: '/favicon.png',
     shortcut: '/favicon.png',
     apple: '/favicon.png',
   },
+  openGraph: {
+    title: "U'n'IVERSE",
+    description: "U'n'IVERSE — Create your own profile card easily and share it with the people you meet to expand your universe.",
+    images: '/favicon.png',
+  }
 };
 
 
