@@ -20,7 +20,7 @@ export default function HomeHero() {
         <p className="mt-10 text-lg md:text-xl text-gray-300">Create your own profile card easily and share it with the people you meet to expand your universe.</p>
 
         <div className="mt-8 flex justify-center gap-3">
-          <Link href="/scanner" className="inline-flex items-center gap-2 bg-white text-gray-900 rounded-md px-5 py-2 font-medium shadow">
+          <Link href="/scanner" className="inline-flex items-center bg-white text-gray-900 rounded-md px-5 py-1 font-medium shadow">
             <Scan size={16} />
             <span>Scan Now</span>
           </Link>

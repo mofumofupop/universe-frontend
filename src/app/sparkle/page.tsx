@@ -21,6 +21,7 @@ const SpaceMap = dynamic(() => import("@/components/Universe/BaseMap"), {
 type SpaceUser = User & {
   position: [number, number];
   relationType: "self" | "friend" | "friend_of_friend";
+  connectedTo?: string; // 接続元のユーザーID（friend_of_friendの場合）
 };
 
 // ローカルストレージから座標を取得
@@ -151,33 +152,44 @@ export default function Sparkle() {
         // friends_friendsを外側の円に配置（半径450-700）
         if (accountData.friends_friends) {
           console.log("friends_friends data:", accountData.friends_friends);
-          const friendsFriendsIds = new Set<string>();
+          const friendsFriendsMap = new Map<string, string>(); // friendFriendId -> friendId
 
           // 重複を除いて、自分と直接の友達以外のユーザーIDを収集
-          Object.values(accountData.friends_friends).forEach((friendsArray) => {
-            console.log("Processing friends_friends array:", friendsArray);
-            friendsArray.forEach((friend) => {
-              if (
-                friend.id !== userId &&
-                !accountData.friends.some((f) => f.id === friend.id)
-              ) {
-                friendsFriendsIds.add(friend.id);
-                console.log(
-                  "Added friend_of_friend:",
-                  friend.id,
-                  friend.username
-                );
-              }
-            });
-          });
+          // connectedTo情報（どのfriendを経由したか）も記録
+          Object.entries(accountData.friends_friends).forEach(
+            ([friendId, friendsArray]) => {
+              console.log(
+                `Processing friends_friends for friend ${friendId}:`,
+                friendsArray
+              );
+              friendsArray.forEach((friend) => {
+                if (
+                  friend.id !== userId &&
+                  !accountData.friends.some((f) => f.id === friend.id)
+                ) {
+                  // まだ記録されていない場合のみ追加（最初の経路を優先）
+                  if (!friendsFriendsMap.has(friend.id)) {
+                    friendsFriendsMap.set(friend.id, friendId);
+                    console.log(
+                      "Added friend_of_friend:",
+                      friend.id,
+                      friend.username,
+                      "via friend:",
+                      friendId
+                    );
+                  }
+                }
+              });
+            }
+          );
 
           console.log(
             "Total friends_friends to fetch:",
-            friendsFriendsIds.size
+            friendsFriendsMap.size
           );
 
           // friends_friendsのユーザー情報を取得して配置
-          for (const friendFriendId of friendsFriendsIds) {
+          for (const [friendFriendId, connectedFriendId] of friendsFriendsMap) {
             try {
               const friendFriendData = await getUser(
                 friendFriendId,
@@ -195,10 +207,13 @@ export default function Sparkle() {
                 social_links: friendFriendData.social_links || [],
                 position,
                 relationType: "friend_of_friend",
+                connectedTo: connectedFriendId, // どのfriendを経由したか
               });
               console.log(
                 "Successfully added friend_of_friend:",
-                friendFriendData.username
+                friendFriendData.username,
+                "connected to:",
+                connectedFriendId
               );
             } catch (err) {
               console.error(
