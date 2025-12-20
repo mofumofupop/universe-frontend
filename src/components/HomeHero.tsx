@@ -129,8 +129,8 @@ export default function HomeHero() {
       <div className="container mx-auto px-4 mt-20 text-center">
         <h3 className="text-lg font-semibold">Let&apos;s get started.</h3>
         <div className="mt-6 flex justify-center gap-3">
-          <button onClick={() => window.dispatchEvent(new CustomEvent('openAuth', { detail: { type: 'login' } }))} className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded"><span>Log in</span><ArrowRight size={16} /></button>
           <button onClick={() => window.dispatchEvent(new CustomEvent('openAuth', { detail: { type: 'signup' } }))} className="inline-flex items-center gap-2 bg-slate-700 text-white px-6 py-3 rounded"><span>Sign up</span><ArrowRight size={16} /></button>
+          <button onClick={() => window.dispatchEvent(new CustomEvent('openAuth', { detail: { type: 'login' } }))} className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded"><span>Log in</span><ArrowRight size={16} /></button>
         </div>
       </div>
     </section>
