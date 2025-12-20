@@ -64,6 +64,12 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
     setError(null);
 
     try {
+      // Username validation: only lowercase letters, numbers and underscore
+      const usernameRE = /^[a-z0-9_]+$/;
+      if (!usernameRE.test(username)) {
+        throw new Error("Username may only contain lowercase letters, numbers, and underscore (_).");
+      }
+
       // パスワードをSHA-256でハッシュ化
       const encoder = new TextEncoder();
       const data = encoder.encode(password);
@@ -181,10 +187,12 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="bg-white border-slate-300 focus:border-slate-500"
+              pattern="[a-z0-9_]+"
+              title="Only lowercase letters (a-z), numbers (0-9), and underscore (_) are allowed"
               required
             />
             <p className="text-xs text-slate-500 mt-1">
-              Enter your @username
+              Enter your @username. Allowed: lowercase letters (a-z), numbers (0-9), underscore (_).
             </p>
           </div>
 
