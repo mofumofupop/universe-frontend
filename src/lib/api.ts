@@ -43,7 +43,7 @@ export interface AccountResponse extends ApiResponse {
   name: string;
   icon_url: string | null;
   friends: Friend[];
-  friends_friends: Record<string, string[]>;
+  friends_friends: Record<string, Friend[]>;
 }
 
 /**
