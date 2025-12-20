@@ -1,7 +1,6 @@
 "use client"; // クライアントコンポーネントであることを明示
 
 import { Map } from "@/components/ui/map"; // shadcnのMap
-import type { MapProps } from "@/components/ui/map";
 import { ImageOverlay, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -57,6 +56,7 @@ export default function SpaceMap({ users }: SpaceMapProps) {
                 className="relative w-12 h-12 rounded-full border-2 border-white shadow-lg overflow-hidden bg-white"
                 style={{ opacity: isFriendOfFriend ? 0.5 : 1 }}
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={user.icon_url}
                   alt={user.name}
