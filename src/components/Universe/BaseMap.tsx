@@ -7,6 +7,7 @@ import "leaflet/dist/leaflet.css";
 import { User } from "@/types/User";
 import { renderToString } from "react-dom/server";
 import { CardPopUp } from "@/components/Card/CardPopUp";
+import { SimpleUserPopUp } from "@/components/Card/SimpleUserPopUp";
 
 // User型に座標情報と関係タイプを追加した型
 type SpaceUser = User & {
@@ -71,8 +72,23 @@ export default function SpaceMap({ users }: SpaceMapProps) {
 
           return (
             <Marker key={user.id} position={user.position} icon={customIcon}>
-              {/* friends_friendsの場合はポップアップを表示しない */}
-              {!isFriendOfFriend && (
+              {/* 関係タイプに応じて異なるポップアップを表示 */}
+              {isFriendOfFriend ? (
+                <Popup
+                  maxWidth={280}
+                  minWidth={260}
+                  className="
+                    [&_.leaflet-popup-content-wrapper]:!bg-transparent 
+                    [&_.leaflet-popup-content-wrapper]:!shadow-none 
+                    [&_.leaflet-popup-content-wrapper]:!rounded-none
+                    [&_.leaflet-popup-content]:!p-0 
+                    [&_.leaflet-popup-content]:!m-0 
+                    [&_.leaflet-popup-content]:!w-[260px]
+                  "
+                >
+                  <SimpleUserPopUp user={user} />
+                </Popup>
+              ) : (
                 <Popup
                   maxWidth={300}
                   minWidth={280}

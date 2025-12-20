@@ -10,7 +10,7 @@ export default function HomeHero() {
   return (
     <section className="bg-gradient-to-b from-gray-900 to-gray-900/80 text-white py-28">
       <div className="w-full px-4">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-center max-w-full">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl tracking-tight text-center max-w-full">
           <span className="block">You and I,</span>
           <span className="block">in U&apos;n&apos;IVERSE.</span>
         </h1>
