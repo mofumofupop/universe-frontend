@@ -15,20 +15,32 @@ export default function QRScanner({ onScan, onError }: QRScannerProps) {
   const isStartedRef = useRef(false);
 
   // ユーザーが指定した facingMode に基づいてデバイスID を取得できるか試す
+  // まず exact で試し、見つからなければ ideal でフォールバックします（参考: navigator.mediaDevices.getUserMedia の facingMode 使用例）
   const getDeviceIdForFacingMode = async (mode: 'environment' | 'user') => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return null;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { exact: mode } as any },
-      } as any);
-      const track = stream.getVideoTracks()[0];
-      const settings = track.getSettings() as MediaTrackSettings & { deviceId?: string };
-      const deviceId = settings.deviceId || null;
-      track.stop();
-      return deviceId;
-    } catch (e) {
-      return null;
-    }
+
+    const tryConstraints = async (constraints: MediaStreamConstraints) => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        const track = stream.getVideoTracks()[0];
+        const settings = track.getSettings() as MediaTrackSettings & { deviceId?: string };
+        const deviceId = settings.deviceId || null;
+        track.stop();
+        return deviceId;
+      } catch {
+        return null;
+      }
+    };
+
+    // 1) 強制指定（exact）で試す
+    const exact = await tryConstraints({ video: { facingMode: { exact: mode } } });
+    if (exact) return exact;
+
+    // 2) 次に理想指定（ideal）で試す
+    const ideal = await tryConstraints({ video: { facingMode: { ideal: mode } } });
+    if (ideal) return ideal;
+
+    return null;
   };
 
   useEffect(() => {
@@ -40,7 +52,7 @@ export default function QRScanner({ onScan, onError }: QRScannerProps) {
         try {
           await scannerRef.current.stop();
           scannerRef.current.clear();
-        } catch (e) {
+        } catch {
           // ignore
         }
         scannerRef.current = null;
@@ -60,35 +72,43 @@ export default function QRScanner({ onScan, onError }: QRScannerProps) {
           return;
         }
 
-        // ユーザー選択に基づきカメラを選択
-        let selectedCameraId: string | null = null;
+        // カメラ選択ロジックを1つのヘルパーにまとめて読みやすくする
+        const selectCameraId = async (mode: 'environment' | 'user' | 'auto') => {
+          const envKeywords = ['back', 'rear', 'environment', '外', 'facing back'];
+          const userKeywords = ['front', 'user', 'facing front'];
 
-        if (facingMode === 'auto') {
-          const backCamera = cameras.find((camera) =>
-            camera.label.toLowerCase().includes('back') ||
-            camera.label.toLowerCase().includes('rear') ||
-            camera.label.toLowerCase().includes('environment') ||
-            camera.label.toLowerCase().includes('外') ||
-            camera.label.toLowerCase().includes('facing back')
-          );
-          selectedCameraId = backCamera?.id || cameras[0].id;
-        } else {
-          // Try to find labeled camera matching mode
-          const candidate = cameras.find((camera) =>
-            camera.label.toLowerCase().includes(facingMode === 'environment' ? 'back' : 'front') ||
-            camera.label.toLowerCase().includes(facingMode === 'environment' ? 'rear' : 'front') ||
-            camera.label.toLowerCase().includes(facingMode === 'environment' ? 'environment' : 'user')
-          );
+          const findByKeywords = (keys: string[]) =>
+            cameras.find((camera) => keys.some((k) => camera.label.toLowerCase().includes(k)));
 
-          if (candidate) {
-            selectedCameraId = candidate.id;
-          } else {
-            // Try getUserMedia with facingMode to find deviceId
-            const deviceId = await getDeviceIdForFacingMode(facingMode);
-            if (deviceId) selectedCameraId = deviceId;
-            else selectedCameraId = cameras[0].id;
+          // auto: 優先順は environment -> user -> deviceId exact/ideal -> fallback
+          if (mode === 'auto') {
+            const byEnv = findByKeywords(envKeywords);
+            if (byEnv) return byEnv.id;
+
+            const byUser = findByKeywords(userKeywords);
+            if (byUser) return byUser.id;
+
+            // try deviceId by exact environment then user
+            const envDevice = await getDeviceIdForFacingMode('environment');
+            if (envDevice) return envDevice;
+            const userDevice = await getDeviceIdForFacingMode('user');
+            if (userDevice) return userDevice;
+
+            return cameras[0].id;
           }
-        }
+
+          // explicit mode (environment or user)
+          const keys = mode === 'environment' ? envKeywords : userKeywords;
+          const found = findByKeywords(keys);
+          if (found) return found.id;
+
+          const deviceId = await getDeviceIdForFacingMode(mode);
+          if (deviceId) return deviceId;
+
+          return cameras[0].id;
+        };
+
+        const selectedCameraId = await selectCameraId(facingMode);
 
         // コンテナ幅から余白を考慮したqrboxサイズを算出
         const container = document.getElementById('qr-reader');
