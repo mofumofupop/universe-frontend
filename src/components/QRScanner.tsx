@@ -6,10 +6,9 @@ import { Html5Qrcode } from "html5-qrcode";
 interface QRScannerProps {
   onScan: (decodedText: string) => void;
   onError?: (error: string) => void;
-  onCancel?: () => void;
 }
 
-export default function QRScanner({ onScan, onError, onCancel }: QRScannerProps) {
+export default function QRScanner({ onScan, onError }: QRScannerProps) {
   const [error, setError] = useState<string | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const isStartedRef = useRef(false);
@@ -102,14 +101,7 @@ export default function QRScanner({ onScan, onError, onCancel }: QRScannerProps)
         </div>
       )}
       
-      {onCancel && (
-        <button
-          onClick={onCancel}
-          className="mt-4 px-6 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-colors"
-        >
-          Cancel
-        </button>
-      )}
+
     </div>
   );
 }

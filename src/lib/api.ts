@@ -192,6 +192,12 @@ export function saveAuthToStorage(userId: string, passwordHash: string): void {
 
   localStorage.setItem("userId", userId);
   localStorage.setItem("passwordHash", passwordHash);
+  // 同一タブでの変化通知（storageイベントは同一タブでは発火しないため）
+  try {
+    window.dispatchEvent(new Event("auth:changed"));
+  } catch {
+    // ignore
+  }
 }
 
 /**
@@ -204,6 +210,11 @@ export function clearAuthFromStorage(): void {
 
   localStorage.removeItem("userId");
   localStorage.removeItem("passwordHash");
+  try {
+    window.dispatchEvent(new Event("auth:changed"));
+  } catch {
+    // ignore
+  }
 }
 
 /**

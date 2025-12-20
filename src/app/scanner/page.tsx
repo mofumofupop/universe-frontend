@@ -93,15 +93,6 @@ export default function ScannerPage() {
     setError(errorMessage);
   };
 
-  const handleCancel = () => {
-    const { userId, passwordHash } = getAuthFromStorage();
-    
-    if (userId && passwordHash) {
-      router.push("/sparkle");
-    } else {
-      router.push("/");
-    }
-  };
 
   return (
     <div className="min-h-screen bg-slate-900">
@@ -110,7 +101,7 @@ export default function ScannerPage() {
 
         {showScanner && !exchangeResult && (
           <div className="mb-6">
-            <QRScanner onScan={handleScan} onError={handleError} onCancel={handleCancel} />
+            <QRScanner onScan={handleScan} onError={handleError} />
 
             {isProcessing && (
               <div className="mt-6 text-center">

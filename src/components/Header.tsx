@@ -4,6 +4,10 @@ import React, { useState } from "react";
 import { useIsLoggedIn } from "@/lib/useIsLoggedIn";
 import AccountMenu from "@/components/AccountMenu";
 import { useRouter } from "next/navigation";
+import { clearAuthFromStorage } from "@/lib/api";
+import { Scan, User } from "lucide-react";
+import { getAuthFromStorage } from "@/lib/api";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { LoginForm } from "./LoginForm";
 import { SignupForm } from "./SignupForm";
@@ -34,6 +38,18 @@ export default function Header({ children, className }: HeaderProps) {
   const [formType, setFormType] = useState<'login' | 'signup'>('login');
   const isLoggedIn = useIsLoggedIn();
   const router = useRouter();
+  const pathname = usePathname();
+  const isScannerPage = pathname?.startsWith("/scanner");
+
+  const handleHeaderCancel = () => {
+    const { userId, passwordHash } = getAuthFromStorage();
+    if (userId && passwordHash) {
+      router.push("/sparkle");
+    } else {
+      router.push("/");
+    }
+  };
+
 
   const openLoginForm = () => {
     setFormType('login');
@@ -50,9 +66,9 @@ export default function Header({ children, className }: HeaderProps) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("uuid");
-    localStorage.removeItem("password");
+    clearAuthFromStorage();
     router.push("/");
+    // 状態反映のためリロード（軽微なアプリ内の状態更新に置き換えても良い）
     window.location.reload();
   };
 
@@ -67,26 +83,39 @@ export default function Header({ children, className }: HeaderProps) {
         {/* Children and Auth Buttons */}
         <div className="flex items-center gap-3 relative">
           {children}
-          {isLoggedIn ? (
-            <>
-              {/* Scan Icon */}
+          {isScannerPage ? (
+            <div className="flex items-center gap-3">
               <button
-                className="p-2 rounded-full hover:bg-slate-200 focus:outline-none border border-slate-300"
+                className="p-2 rounded-full focus:outline-none bg-transparent"
+                onClick={handleHeaderCancel}
+                aria-label="Cancel"
+                title="Cancel"
+              >
+                <span className="w-6 h-6 inline-flex items-center justify-center">
+                  {(() => {
+                    // アイコンは常にUserに統一
+                    return <User size={20} className="text-white" />;
+                  })()}
+                </span>
+              </button>
+              {isLoggedIn === true && <AccountMenu onLogout={handleLogout} buttonClassName="" iconClassName="text-white" />}
+            </div>
+          ) : isLoggedIn === true ? (
+            <>
+              {/* Scan Icon (no frame, white icon) */}
+              <button
+                className="p-2 rounded-full focus:outline-none inline-flex items-center justify-center"
                 onClick={() => router.push("/scanner")}
                 aria-label="Scan QR"
               >
-                {/* QR/Scan icon */}
-                <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <rect x="3" y="3" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="2" />
-                  <rect x="14" y="3" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="2" />
-                  <rect x="14" y="14" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="2" />
-                  <rect x="3" y="14" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="2" />
-                </svg>
+                <span className="w-6 h-6 inline-flex items-center justify-center">
+                  <Scan size={20} className="text-white" />
+                </span>
               </button>
-              {/* Account Menu */}
-              <AccountMenu onLogout={handleLogout} />
+              {/* Account Menu (no frame, white icon) */}
+              <AccountMenu onLogout={handleLogout} buttonClassName="" iconClassName="text-white" />
             </>
-          ) : (
+          ) : isLoggedIn === false ? (
             <>
               <Button 
                 variant="outline"
@@ -101,6 +130,16 @@ export default function Header({ children, className }: HeaderProps) {
               >
                 Log in
               </Button>
+            </>
+          ) : (
+            // 初期読み込み中（レイアウト崩れを防ぐためのプレースホルダー）
+            <>
+              <button className="p-2 rounded-full focus:outline-none inline-flex items-center justify-center opacity-0 pointer-events-none">
+                <span className="w-6 h-6 inline-flex items-center justify-center">
+                  <Scan size={20} />
+                </span>
+              </button>
+              <AccountMenu onLogout={() => {}} buttonClassName="pointer-events-none" iconClassName="opacity-0" />
             </>
           )}
           {/* Form Display */}
