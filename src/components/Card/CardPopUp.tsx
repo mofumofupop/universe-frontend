@@ -10,7 +10,7 @@ interface CardPopUpProps {
 
 export function CardPopUp({ user }: CardPopUpProps) {
   return (
-    <div className="w-[280px] aspect-[1.62/1] font-inter bg-slate-50 rounded-lg flex flex-col justify-center shrink-0 overflow-hidden shadow-lg">
+    <div className="w-[280px] aspect-[1.62/1] font-inter bg-slate-50 rounded-lg flex flex-col justify-center shrink-0 shadow-lg">
       {/* ヘッダー部分: アバターと基本情報 */}
       <div className="flex items-center gap-3 mx-4 mt-3 pt-4 pl-2">
         <Avatar className="w-16 h-16 shadow-md shrink-0">
@@ -31,7 +31,7 @@ export function CardPopUp({ user }: CardPopUpProps) {
       </div>
 
       {/* ソーシャルリンク */}
-      <div className="w-full mx-auto mt-1 mb-1 py-2">
+      <div className="w-full mx-auto mt-1 mb-1 py-2 z-50">
         <SocialLinksRow links={user.social_links} />
       </div>
 
