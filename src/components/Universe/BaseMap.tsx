@@ -194,7 +194,7 @@ export default function SpaceMap({ users }: SpaceMapProps) {
           const customIcon = L.divIcon({
             html: renderToString(
               <div
-                className="relative w-12 h-12 rounded-full border-2 border-white shadow-lg overflow-hidden bg-white"
+                className="relative w-12 h-12 rounded-full border-2 border-slate-50 shadow-lg overflow-hidden bg-slate-50"
                 style={{
                   filter: isFriendOfFriend
                     ? "brightness(0.7) saturate(0.7)"
@@ -245,7 +245,7 @@ export default function SpaceMap({ users }: SpaceMapProps) {
                 </Popup>
               ) : (
                 <Popup
-                  maxWidth={300}
+                  maxWidth={320}
                   minWidth={280}
                   className="
                     [&_.leaflet-popup-content-wrapper]:!bg-transparent 

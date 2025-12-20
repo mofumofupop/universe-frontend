@@ -20,11 +20,16 @@ export const SocialIcon = ({ url, className = "" }: SocialIconProps) => {
     // Normalize and extract hostname safely
     let hostname = "";
     try {
-      const parsed = new URL(linkUrl.includes("://") ? linkUrl : `https://${linkUrl}`);
+      const parsed = new URL(
+        linkUrl.includes("://") ? linkUrl : `https://${linkUrl}`
+      );
       hostname = parsed.hostname.replace(/^www\./i, "").toLowerCase();
     } catch {
       // Fallback: strip protocol and www then take up to first slash
-      const s = linkUrl.replace(/^https?:\/\//i, "").replace(/^www\./i, "").toLowerCase();
+      const s = linkUrl
+        .replace(/^https?:\/\//i, "")
+        .replace(/^www\./i, "")
+        .toLowerCase();
       hostname = s.split("/")[0];
     }
 
@@ -33,11 +38,17 @@ export const SocialIcon = ({ url, className = "" }: SocialIconProps) => {
       { regex: /(^|\.)twitter\.com$/i, icon: "ri:twitter-x-fill" },
       { regex: /(^|\.)instagram\.com$/i, icon: "mdi:instagram" },
       { regex: /(^|\.)github\.com$/i, icon: "mdi:github" },
-      { regex: /(^|\.)discord(?:\.gg|\.com|app\.com|app\.net)$/i, icon: "ic:baseline-discord" },
+      {
+        regex: /(^|\.)discord(?:\.gg|\.com|app\.com|app\.net)$/i,
+        icon: "ic:baseline-discord",
+      },
       { regex: /(^|\.)soundcloud\.com$/i, icon: "mdi:soundcloud" },
       { regex: /(^|\.)youtube\.com$|(^|\.)youtu\.be$/i, icon: "mdi:youtube" },
       { regex: /(^|\.)spotify\.com$/i, icon: "mdi:spotify" },
-      { regex: /(^|\.)t\.me$|(^|\.)telegram\.me$|(^|\.)telegram\.org$/i, icon: "mdi:telegram" },
+      {
+        regex: /(^|\.)t\.me$|(^|\.)telegram\.me$|(^|\.)telegram\.org$/i,
+        icon: "mdi:telegram",
+      },
       { regex: /(^|\.)linkedin\.com$/i, icon: "mdi:linkedin" },
       { regex: /(^|\.)patreon\.com$/i, icon: "simple-icons:patreon" },
       { regex: /(^|\.)buymeacoffee\.com$/i, icon: "simple-icons:buymeacoffee" },
@@ -52,7 +63,10 @@ export const SocialIcon = ({ url, className = "" }: SocialIconProps) => {
       { regex: /(^|\.)behance\.net$/i, icon: "simple-icons:behance" },
       { regex: /(^|\.)artstation\.com$/i, icon: "simple-icons:artstation" },
       { regex: /(^|\.)gitlab\.com$/i, icon: "simple-icons:gitlab" },
-      { regex: /(^|\.)stackoverflow\.com$/i, icon: "simple-icons:stackoverflow" },
+      {
+        regex: /(^|\.)stackoverflow\.com$/i,
+        icon: "simple-icons:stackoverflow",
+      },
       { regex: /(^|\.)reddit\.com$/i, icon: "simple-icons:reddit" },
       { regex: /(^|\.)producthunt\.com$/i, icon: "simple-icons:producthunt" },
       { regex: /(^|\.)ycombinator\.com$/i, icon: "simple-icons:ycombinator" },
@@ -65,7 +79,10 @@ export const SocialIcon = ({ url, className = "" }: SocialIconProps) => {
       { regex: /(^|\.)pixiv\.me$/i, icon: "simple-icons:pixiv" },
       { regex: /(^|\.)fanbox\.cc$/i, icon: "simple-icons:pixiv" },
       { regex: /(^|\.)booth\.pm$/i, icon: "simple-icons:pixiv" },
-      { regex: /(^|\.)((bsky\.social)|(bluesky\.org))$/i, icon: "simple-icons:bluesky" },
+      {
+        regex: /(^|\.)((bsky\.social)|(bluesky\.org))$/i,
+        icon: "simple-icons:bluesky",
+      },
       { regex: /(^|\.)twitch\.tv$/i, icon: "mdi:twitch" },
       { regex: /(^|\.)mastodon(\.|$)/i, icon: "mdi:mastodon" },
       { regex: /(^|\.)misskey(\.|$)/i, icon: "simple-icons:misskey" },
@@ -84,7 +101,7 @@ export const SocialIcon = ({ url, className = "" }: SocialIconProps) => {
   if (!url) {
     return (
       <div className={commonClasses}>
-        <IconBackgroundShape className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 h-1/2 text-slate-400 drop-shadow-md opacity-50" />
+        <IconBackgroundShape className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] text-slate-400 drop-shadow-md opacity-50" />
       </div>
     );
   }
@@ -98,7 +115,7 @@ export const SocialIcon = ({ url, className = "" }: SocialIconProps) => {
       rel="noopener noreferrer"
       className={commonClasses}
     >
-      <IconBackgroundShape className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full text-slate-500" />
+      <IconBackgroundShape className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] text-slate-500" />
       <Icon
         icon={icon}
         className="relative z-10 text-white pointer-events-none"
