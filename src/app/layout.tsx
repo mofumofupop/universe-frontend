@@ -27,8 +27,8 @@ const notoSansJP = Noto_Sans_JP({
 
 export const metadata = {
   icons: {
-    icon: '/favicon.png',
-    shortcut: '/favicon.png',
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
     apple: '/favicon.png',
   },
 };
@@ -45,6 +45,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${notoSansJP.variable} antialiased`}
       >
         {children}
+        {/* Register the service worker on the client */}
+        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+        {/* @ts-ignore (imported client component) */}
+        <script dangerouslySetInnerHTML={{ __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(e=>console.error('sw reg',e))}` }} />
       </body>
     </html>
   );
