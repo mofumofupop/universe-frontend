@@ -1,6 +1,6 @@
 {
-  "name": "U'n'iverse",
-  "short_name": "U'n'iverse",
+  "name": "U'n'IVERSE",
+  "short_name": "U'n'IVERSE",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -8,20 +8,16 @@
   "background_color": "#0f172a",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "any",
-      "type": "image/x-icon",
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
     },
     {
       "src": "/favicon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/favicon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
