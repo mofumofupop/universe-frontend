@@ -10,20 +10,20 @@ interface QRScannerProps {
 
 export default function QRScanner({ onScan, onError }: QRScannerProps) {
   const [error, setError] = useState<string | null>(null);
-  const [cameras, setCameras] = useState<Array<{ id: string; label: string }>>([]);
-  const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
+  const [facingMode, setFacingMode] = useState<'environment' | 'user' | 'auto'>('environment');
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const isStartedRef = useRef(false);
 
-  // Helper: try to get a deviceId using facingMode='environment'
-  const getEnvironmentDeviceId = async (): Promise<string | null> => {
+  // ユーザーが指定した facingMode に基づいてデバイスID を取得できるか試す
+  const getDeviceIdForFacingMode = async (mode: 'environment' | 'user') => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return null;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: mode } as any },
+      } as any);
       const track = stream.getVideoTracks()[0];
       const settings = track.getSettings() as MediaTrackSettings & { deviceId?: string };
       const deviceId = settings.deviceId || null;
-      // stop to avoid keeping camera open
       track.stop();
       return deviceId;
     } catch (e) {
@@ -31,77 +31,96 @@ export default function QRScanner({ onScan, onError }: QRScannerProps) {
     }
   };
 
-  const startScannerWithCamera = async (cameraId: string | null) => {
-    try {
-      const minSize = Math.min(window.innerWidth - 32, 400); // leave 16px padding on each side
-
-      const scanner = new Html5Qrcode("qr-reader");
-      scannerRef.current = scanner;
-
-      await scanner.start(
-        cameraId ?? undefined,
-        {
-          fps: 10,
-          qrbox: { width: minSize, height: minSize },
-          aspectRatio: 1.0,
-        },
-        (decodedText) => {
-          onScan(decodedText);
-        },
-        () => {
-          // ignore minor scan errors
-        }
-      );
-    } catch (err) {
-      console.error("スキャンの開始に失敗:", err);
-      const errorMsg = "カメラへのアクセスに失敗しました";
-      setError(errorMsg);
-      onError?.(errorMsg);
-    }
-  };
-
   useEffect(() => {
+    let mounted = true;
+
     const startScanning = async () => {
-      if (isStartedRef.current) return;
+      // Stop existing scanner if any
+      if (scannerRef.current) {
+        try {
+          await scannerRef.current.stop();
+          scannerRef.current.clear();
+        } catch (e) {
+          // ignore
+        }
+        scannerRef.current = null;
+        isStartedRef.current = false;
+      }
+
       isStartedRef.current = true;
 
       try {
-        // カメラ取得
-        const cams = await Html5Qrcode.getCameras();
-        setCameras(cams || []);
+        // カメラの取得
+        const cameras = await Html5Qrcode.getCameras();
 
-        if (!cams || cams.length === 0) {
+        if (!cameras || cameras.length === 0) {
           const errorMsg = "カメラが見つかりませんでした";
           setError(errorMsg);
           onError?.(errorMsg);
           return;
         }
 
-        // Try facingMode approach to prefer back camera
-        const envDeviceId = await getEnvironmentDeviceId();
-        let chosenId: string | null = null;
-        if (envDeviceId) {
-          const match = cams.find((c) => c.id === envDeviceId);
-          if (match) chosenId = match.id;
-        }
+        // ユーザー選択に基づきカメラを選択
+        let selectedCameraId: string | null = null;
 
-        // Fallback: find by label
-        if (!chosenId) {
-          const backCamera = cams.find((camera) =>
-            camera.label.toLowerCase().includes("back") ||
-            camera.label.toLowerCase().includes("rear") ||
-            camera.label.toLowerCase().includes("environment") ||
-            camera.label.toLowerCase().includes("外") ||
-            camera.label.toLowerCase().includes("facing back")
+        if (facingMode === 'auto') {
+          const backCamera = cameras.find((camera) =>
+            camera.label.toLowerCase().includes('back') ||
+            camera.label.toLowerCase().includes('rear') ||
+            camera.label.toLowerCase().includes('environment') ||
+            camera.label.toLowerCase().includes('外') ||
+            camera.label.toLowerCase().includes('facing back')
           );
-          chosenId = backCamera?.id || cams[0].id;
+          selectedCameraId = backCamera?.id || cameras[0].id;
+        } else {
+          // Try to find labeled camera matching mode
+          const candidate = cameras.find((camera) =>
+            camera.label.toLowerCase().includes(facingMode === 'environment' ? 'back' : 'front') ||
+            camera.label.toLowerCase().includes(facingMode === 'environment' ? 'rear' : 'front') ||
+            camera.label.toLowerCase().includes(facingMode === 'environment' ? 'environment' : 'user')
+          );
+
+          if (candidate) {
+            selectedCameraId = candidate.id;
+          } else {
+            // Try getUserMedia with facingMode to find deviceId
+            const deviceId = await getDeviceIdForFacingMode(facingMode);
+            if (deviceId) selectedCameraId = deviceId;
+            else selectedCameraId = cameras[0].id;
+          }
         }
 
-        setSelectedCameraId(chosenId || cams[0].id);
-        await startScannerWithCamera(chosenId || cams[0].id);
+        // コンテナ幅から余白を考慮したqrboxサイズを算出
+        const container = document.getElementById('qr-reader');
+        const containerWidth = container ? Math.min(container.clientWidth, window.innerWidth) : window.innerWidth;
+        const horizontalPadding = 32; // 画面端との余白
+        const maxBox = 400;
+        const boxSize = Math.max(160, Math.min(maxBox, containerWidth - horizontalPadding));
+
+        const scanner = new Html5Qrcode('qr-reader');
+        scannerRef.current = scanner;
+
+        if (!mounted) return;
+
+        await scanner.start(
+          selectedCameraId!,
+          {
+            fps: 10,
+            qrbox: { width: boxSize, height: boxSize },
+            aspectRatio: 1.0,
+            // Optional: prefer front/back via facingMode in constraints is handled above
+          },
+          (decodedText) => {
+            onScan(decodedText);
+          },
+          () => {
+            // スキャンエラー（通常は無視して良い）
+          }
+        );
+        setError(null);
       } catch (err) {
-        console.error("スキャンの開始に失敗:", err);
-        const errorMsg = "カメラへのアクセスに失敗しました";
+        console.error('スキャンの開始に失敗:', err);
+        const errorMsg = 'カメラへのアクセスに失敗しました';
         setError(errorMsg);
         onError?.(errorMsg);
       }
@@ -109,63 +128,56 @@ export default function QRScanner({ onScan, onError }: QRScannerProps) {
 
     startScanning();
 
+    // restart when facingMode changes
     return () => {
-      // クリーンアップ
+      mounted = false;
       if (scannerRef.current) {
         scannerRef.current
           .stop()
           .then(() => {
             scannerRef.current?.clear();
+            scannerRef.current = null;
+            isStartedRef.current = false;
           })
           .catch((err) => {
-            console.error("スキャナーの停止に失敗:", err);
+            console.error('スキャナーの停止に失敗:', err);
           });
       }
     };
-  }, []);
-
-  // allow user to switch cameras
-  const onSelectCamera = async (id: string) => {
-    // stop current
-    if (scannerRef.current) {
-      await scannerRef.current.stop().catch(() => {});
-      await scannerRef.current.clear().catch(() => {});
-    }
-
-    // if id === 'environment', try to resolve deviceId dynamically
-    let deviceIdToUse = id;
-    if (id === 'environment') {
-      const env = await getEnvironmentDeviceId();
-      if (env) deviceIdToUse = env;
-    }
-
-    setSelectedCameraId(deviceIdToUse);
-    await startScannerWithCamera(deviceIdToUse ?? undefined);
-  };
+    // onErrorは親から渡されるため、依存配列に含めない
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [facingMode]);
 
   return (
-    <div className="flex flex-col items-center gap-4 w-full mx-auto px-4">
-      {/* Camera selector (visible when multiple cameras detected) */}
-      {cameras && cameras.length > 1 && (
-        <div className="w-full max-w-md mx-auto flex justify-center mb-2 gap-2">
-          <select
-            value={selectedCameraId ?? ''}
-            onChange={(e) => onSelectCamera(e.target.value)}
-            className="bg-slate-800 text-white px-3 py-2 rounded"
-          >
-            <option value="">Auto</option>
-            <option value="environment">Back camera (preferred)</option>
-            {cameras.map((c) => (
-              <option key={c.id} value={c.id}>{c.label || c.id}</option>
-            ))}
-          </select>
-        </div>
-      )}
+    <div className="flex flex-col items-center gap-4 w-full mx-auto">
+      <div className="flex gap-2 items-center justify-center mt-2">
+        <button
+          className={`px-3 py-1 rounded ${facingMode === 'environment' ? 'bg-white text-gray-900' : 'bg-transparent text-gray-300'}`}
+          onClick={() => setFacingMode('environment')}
+          aria-pressed={facingMode === 'environment'}
+        >
+          Back
+        </button>
+        <button
+          className={`px-3 py-1 rounded ${facingMode === 'auto' ? 'bg-white text-gray-900' : 'bg-transparent text-gray-300'}`}
+          onClick={() => setFacingMode('auto')}
+          aria-pressed={facingMode === 'auto'}
+        >
+          Auto
+        </button>
+        <button
+          className={`px-3 py-1 rounded ${facingMode === 'user' ? 'bg-white text-gray-900' : 'bg-transparent text-gray-300'}`}
+          onClick={() => setFacingMode('user')}
+          aria-pressed={facingMode === 'user'}
+        >
+          Front
+        </button>
+      </div>
 
       <div
         id="qr-reader"
-        className="w-full aspect-square max-w-[400px] mx-auto rounded-lg overflow-hidden border-2 border-slate-600 shadow-lg"
-        style={{ width: '100%' }}
+        className="w-full rounded-lg overflow-hidden border-2 border-slate-600 shadow-lg"
+        style={{ maxWidth: "min(400px, calc(100vw - 32px))", width: "min(400px, calc(100vw - 32px))" }}
       />
 
       {error && (
