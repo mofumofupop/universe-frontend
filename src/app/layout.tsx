@@ -25,10 +25,6 @@ const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
 });
 
-export const metadata: Metadata = {
-  title: "U'n'IVERSE - Only Universe of You and I",
-  description: "Exchangeable Digital Card Platform",
-};
 
 export default function RootLayout({
   children,

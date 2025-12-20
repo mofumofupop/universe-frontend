@@ -1,17 +1,11 @@
-import Link from 'next/link';
 import Header from '@/components/Header';
+import HomeHero from '@/components/HomeHero';
 
-
-export default function Home () {
+export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <main className="min-h-screen bg-slate-900">
       <Header className="text-white" />
-      <h1>Welcome to Universe</h1>
-      <Link href="/sparkle">
-          <button className="bg-slate-400 text-white p-2 rounded-lg shadow-md">
-              Log in
-          </button>
-      </Link>
-    </div>
+      <HomeHero />
+    </main>
   );
 }
