@@ -22,7 +22,7 @@ export default function QRScanner({ onScan, onError, onCancel }: QRScannerProps)
       try {
         // カメラの取得
         const cameras = await Html5Qrcode.getCameras();
-        
+
         if (!cameras || cameras.length === 0) {
           const errorMsg = "カメラが見つかりませんでした";
           setError(errorMsg);
@@ -30,14 +30,19 @@ export default function QRScanner({ onScan, onError, onCancel }: QRScannerProps)
           return;
         }
 
-        // プライマリカメラ（背面カメラ）を自動選択
+        // 外カメラ優先で選択
         const backCamera = cameras.find(
           (camera) =>
             camera.label.toLowerCase().includes("back") ||
             camera.label.toLowerCase().includes("rear") ||
-            camera.label.toLowerCase().includes("環境")
+            camera.label.toLowerCase().includes("environment") ||
+            camera.label.toLowerCase().includes("外") ||
+            camera.label.toLowerCase().includes("facing back")
         );
         const cameraId = backCamera?.id || cameras[0].id;
+
+        // 画面幅に応じてqrboxサイズを調整
+        const minSize = Math.min(window.innerWidth, 400);
 
         const scanner = new Html5Qrcode("qr-reader");
         scannerRef.current = scanner;
@@ -46,17 +51,14 @@ export default function QRScanner({ onScan, onError, onCancel }: QRScannerProps)
           cameraId,
           {
             fps: 10,
-            qrbox: { width: 250, height: 250 },
+            qrbox: { width: minSize, height: minSize },
             aspectRatio: 1.0,
           },
           (decodedText) => {
-            // QRコードを読み取ったら
             onScan(decodedText);
-            // スキャン後も継続するため、stopは呼ばない
           },
           () => {
             // スキャンエラー（通常は無視して良い）
-            // QRコードが見つからない場合などに呼ばれる
           }
         );
       } catch (err) {
@@ -90,7 +92,8 @@ export default function QRScanner({ onScan, onError, onCancel }: QRScannerProps)
     <div className="flex flex-col items-center gap-4 w-full mx-auto">
       <div
         id="qr-reader"
-        className="w-full aspect-square max-w-md mx-auto rounded-lg overflow-hidden border-2 border-slate-600 shadow-lg"
+        className="w-full aspect-square max-w-xs mx-auto rounded-lg overflow-hidden border-2 border-slate-600 shadow-lg"
+        style={{ maxWidth: "400px", width: "100vw" }}
       />
 
       {error && (

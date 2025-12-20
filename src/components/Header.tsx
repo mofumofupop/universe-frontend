@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import { useIsLoggedIn } from "@/lib/useIsLoggedIn";
+import AccountMenu from "@/components/AccountMenu";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { LoginForm } from "./LoginForm";
 import { SignupForm } from "./SignupForm";
@@ -29,6 +32,8 @@ const Logo = ({ className }: { className?: string }) => (
 export default function Header({ children, className }: HeaderProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formType, setFormType] = useState<'login' | 'signup'>('login');
+  const isLoggedIn = useIsLoggedIn();
+  const router = useRouter();
 
   const openLoginForm = () => {
     setFormType('login');
@@ -44,6 +49,13 @@ export default function Header({ children, className }: HeaderProps) {
     setIsFormOpen(false);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("uuid");
+    localStorage.removeItem("password");
+    router.push("/");
+    window.location.reload();
+  };
+
   return (
     <header className={`fixed top-0 left-0 right-0 w-full bg-gradient-to-b from-gray-900 to-gray-900/50 pl-8 pr-8 py-0 z-50 ${className || ''}`}>
       <div className="w-full flex items-center justify-between">
@@ -55,22 +67,42 @@ export default function Header({ children, className }: HeaderProps) {
         {/* Children and Auth Buttons */}
         <div className="flex items-center gap-3 relative">
           {children}
-          
-          <Button 
-            variant="outline"
-            className="bg-slate-700 hover:bg-slate-600 text-white border-slate-600 rounded-md px-6 py-2 font-medium"
-            onClick={openSignupForm}
-          >
-            Sign up
-          </Button>
-
-          <Button 
-            className="bg-white hover:bg-gray-100 text-gray-900 rounded-md px-6 py-2 font-medium border-none"
-            onClick={openLoginForm}
-          >
-            Log in
-          </Button>
-
+          {isLoggedIn ? (
+            <>
+              {/* Scan Icon */}
+              <button
+                className="p-2 rounded-full hover:bg-slate-200 focus:outline-none border border-slate-300"
+                onClick={() => router.push("/scanner")}
+                aria-label="Scan QR"
+              >
+                {/* QR/Scan icon */}
+                <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <rect x="3" y="3" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="2" />
+                  <rect x="14" y="3" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="2" />
+                  <rect x="14" y="14" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="2" />
+                  <rect x="3" y="14" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              </button>
+              {/* Account Menu */}
+              <AccountMenu onLogout={handleLogout} />
+            </>
+          ) : (
+            <>
+              <Button 
+                variant="outline"
+                className="bg-slate-700 hover:bg-slate-600 text-white border-slate-600 rounded-md px-6 py-2 font-medium"
+                onClick={openSignupForm}
+              >
+                Sign up
+              </Button>
+              <Button 
+                className="bg-white hover:bg-gray-100 text-gray-900 rounded-md px-6 py-2 font-medium border-none"
+                onClick={openLoginForm}
+              >
+                Log in
+              </Button>
+            </>
+          )}
           {/* Form Display */}
           {isFormOpen && (
             <div 
