@@ -11,7 +11,8 @@ module.exports = {
   theme: {
   	extend: {
   		fontFamily: {
-  			inter: ['var(--font-inter)'],
+  				sans: ['var(--font-lilex)'],
+				inter: ['var(--font-inter)'],
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
