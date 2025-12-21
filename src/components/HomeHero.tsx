@@ -27,8 +27,8 @@ export default function HomeHero() {
             href="/scanner"
             className="inline-flex items-center gap-2 bg-white text-gray-900 rounded-md px-5 py-1 font-medium shadow"
           >
-            <Scan size={16} />
             <span>Scan Now</span>
+            <Scan size={16} />
           </Link>
           <Button
             onClick={() =>

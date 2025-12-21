@@ -189,12 +189,23 @@ export default function SpaceMap({ users }: SpaceMapProps) {
         {/* ユーザーのマーカーを表示 */}
         {users.map((user) => {
           const isFriendOfFriend = user.relationType === "friend_of_friend";
+          const isSelf = user.relationType === "self";
+
+          // アイコンサイズを関係性に応じて変更
+          const iconSize = isSelf ? 72 : isFriendOfFriend ? 40 : 48;
+          const iconAnchor = isSelf ? 36 : isFriendOfFriend ? 20 : 24;
 
           // icon_urlを使用したカスタムアイコンを作成
           const customIcon = L.divIcon({
             html: renderToString(
               <div
-                className="relative w-12 h-12 rounded-full border-2 border-slate-50 shadow-lg overflow-hidden bg-slate-50"
+                className={`relative rounded-full border-2 border-slate-50 shadow-lg overflow-hidden bg-slate-50 ${
+                  isSelf
+                    ? "w-[60px] h-[60px]"
+                    : isFriendOfFriend
+                    ? "w-10 h-10"
+                    : "w-12 h-12"
+                }`}
                 style={{
                   filter: isFriendOfFriend
                     ? "brightness(0.7) saturate(0.7)"
@@ -210,8 +221,8 @@ export default function SpaceMap({ users }: SpaceMapProps) {
               </div>
             ),
             className: "", // Leafletのデフォルトスタイルを無効化
-            iconSize: [48, 48],
-            iconAnchor: [24, 24],
+            iconSize: [iconSize, iconSize],
+            iconAnchor: [iconAnchor, iconAnchor],
           });
 
           return (
