@@ -20,7 +20,7 @@ import { SimpleUserPopUp } from "@/components/Card/SimpleUserPopUp";
 type SpaceUser = User & {
   position: [number, number]; // [y, x]
   relationType: "self" | "friend" | "friend_of_friend"; // 関係タイプ
-  connectedTo?: string; // 接続元のユーザーID（friend_of_friendの場合）
+  connectedTo?: string[]; // 接続元のユーザーID配列（friend_of_friendの場合、複数のfriendsからの接続）
 };
 
 interface SpaceMapProps {
@@ -95,7 +95,7 @@ export default function SpaceMap({ users }: SpaceMapProps) {
         .filter(
           (u) =>
             u.relationType === "friend_of_friend" &&
-            u.connectedTo === selectedUserId
+            u.connectedTo?.includes(selectedUserId)
         )
         .forEach((friendOfFriend) => {
           lines.push({
@@ -105,28 +105,29 @@ export default function SpaceMap({ users }: SpaceMapProps) {
           });
         });
     } else if (selectedUser.relationType === "friend_of_friend") {
-      // friend_of_friendが選択された場合 → 経由したfriendへの線
-      if (selectedUser.connectedTo) {
-        const connectedFriend = users.find(
-          (u) => u.id === selectedUser.connectedTo
-        );
-        if (connectedFriend) {
-          lines.push({
-            start: connectedFriend.position,
-            end: selectedUser.position,
-            type: "friend-to-friend-of-friend",
-          });
+      // friend_of_friendが選択された場合 → 経由したすべてのfriendsへの線
+      if (selectedUser.connectedTo && selectedUser.connectedTo.length > 0) {
+        const selfUser = users.find((u) => u.relationType === "self");
 
-          // さらに、そのfriendから自分への線も表示
-          const selfUser = users.find((u) => u.relationType === "self");
-          if (selfUser) {
+        selectedUser.connectedTo.forEach((connectedFriendId) => {
+          const connectedFriend = users.find((u) => u.id === connectedFriendId);
+          if (connectedFriend) {
             lines.push({
-              start: selfUser.position,
-              end: connectedFriend.position,
-              type: "self-to-friend",
+              start: connectedFriend.position,
+              end: selectedUser.position,
+              type: "friend-to-friend-of-friend",
             });
+
+            // さらに、そのfriendから自分への線も表示
+            if (selfUser) {
+              lines.push({
+                start: selfUser.position,
+                end: connectedFriend.position,
+                type: "self-to-friend",
+              });
+            }
           }
-        }
+        });
       }
     }
 
