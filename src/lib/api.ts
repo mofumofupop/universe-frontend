@@ -476,3 +476,41 @@ export async function uploadIcon(
     throw error;
   }
 }
+
+/**
+ * ユーザー情報を更新する
+ * @param userId ユーザーのUUID
+ * @param passwordHash SHA-256でハッシュ化されたパスワード
+ * @param body 更新するフィールド (name, affiliation, social_links)
+ */
+export async function updateProfile(
+  userId: string,
+  passwordHash: string,
+  body: { name?: string | null; affiliation?: string | null; social_links?: string[] }
+): Promise<ApiResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/change`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: userId, password_hash: passwordHash, ...body }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "更新に失敗しました");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Update Profile API Error:", error);
+    if (error instanceof TypeError && error.message === "Failed to fetch") {
+      throw new Error(
+        `バックエンドサーバーに接続できません。${API_BASE_URL} が起動しているか確認してください。`
+      );
+    }
+    throw error;
+  }
+}

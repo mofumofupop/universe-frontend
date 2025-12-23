@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Menu, X, User, Settings, LogOut } from "lucide-react";
+import EditProfileModal from "@/components/EditProfileModal";
 
 interface MenuProps {
   onLogout?: () => void;
@@ -15,6 +16,7 @@ export default function AccountMenu({
   iconClassName,
 }: MenuProps) {
   const [open, setOpen] = useState(false);
+  const [showProfileOpen, setShowProfileOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   // 外部クリックで閉じる
@@ -66,7 +68,7 @@ export default function AccountMenu({
             My Account
           </div>
           <div className="border-t border-slate-200" />
-          <button className="flex items-center gap-2 px-6 py-3 w-full text-slate-800 hover:bg-slate-100 first:rounded-t-lg last:rounded-b-lg">
+          <button onClick={() => { setOpen(false); setShowProfileOpen(true); }} className="flex items-center gap-2 px-6 py-3 w-full text-slate-800 hover:bg-slate-100 first:rounded-t-lg last:rounded-b-lg">
             <User size={18} /> <span>Profile</span>
           </button>
           <button className="flex items-center gap-2 px-6 py-3 w-full text-slate-800 hover:bg-slate-100 first:rounded-t-lg last:rounded-b-lg">
@@ -81,6 +83,7 @@ export default function AccountMenu({
           </button>
         </div>
       )}
+      <EditProfileModal open={showProfileOpen} onOpenChange={setShowProfileOpen} />
     </div>
   );
 }
